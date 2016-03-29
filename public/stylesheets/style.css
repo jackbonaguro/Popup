@@ -1,0 +1,70 @@
+body {
+  padding: 30px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+h1 {
+	color: #07B;
+}
+
+h1 a {
+	text-decoration: none;
+}
+
+h2 {
+	margin:0 0 .5em 0;
+	color: #07B;
+}
+
+.wrapper {
+	padding-left:312px;
+	position:relative;
+}
+	table {
+		margin:0 0 30px 0;
+		border: ;
+		border-collapse:separate;
+		border-spacing:0px;
+		background:#CCC;
+	}
+		table th {
+			background:#07B;
+			color: #FFF;
+			font-weight:600;
+			padding:10px 20px;
+			text-align:center;
+		}
+		table tbody {
+			padding:0; margin:0;
+			border-collapse:collapse;
+			border-spacing:0px;
+		}
+			table td {
+				background:#EEE;
+				padding:5px 10px;
+				text-align:center;
+			}
+
+.preview {
+	width:400px;
+}
+
+#postInfo {
+	width:250px;
+	position:absolute;
+	top:0; left:0;
+}
+	#postInfo p {
+		padding:15px;
+		border:1px solid #CCC;
+		background:rgba(80,120,255,0.05);
+	}
+
+fieldset {
+	border:0;
+	padding:0; margin:0;
+}

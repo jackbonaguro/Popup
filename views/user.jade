@@ -1,0 +1,22 @@
+extends layout
+
+block content
+	div(class='wrapper')
+		h2= title
+		table(id='userTable')
+			thead
+				th Username
+				th Bio
+				th Date
+			tbody
+	div(class='wrapper')
+		h2= heading2
+		table(id='postTable')
+			thead
+				th Content
+				th Date
+			tbody
+	script(type='text/javascript').
+		var user_name = !{JSON.stringify(username)};
+		console.log("user_name: ", username);
+	script(src="/javascripts/user.js")

@@ -1,0 +1,15 @@
+extends layout
+
+block content
+	div(class='wrapper')
+		h2= title
+		table(id='postTable')
+				thead
+					th User
+					th Content
+					th Date
+				tbody
+	script(type='text/javascript').
+		var post_id = !{JSON.stringify(postid)};
+		console.log('post_id: ', post_id);
+	script(src='/javascripts/post.js')
