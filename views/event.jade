@@ -3,26 +3,27 @@ extends layout
 block content
 	div(class='wrapper')
 		h2= title
-		table(id='userTable')
+		table(id='eventTable')
 			thead
-				th Username
-				th Bio
+				th Event Name
+				th Description
 				th Date
 			tbody
 	div(class='wrapper')
 		h2= heading2
 		table(id='postTable')
 			thead
+				th User
 				th Content
 				th Date
 			tbody
 		h2= heading3
-		table(id='eventTable')
-				thead
-						th Event Name
-						th Description
-						th Date
-				tbody
+		table(id='userTable')
+			thead
+				th Username
+				th Bio
+				th Date
+			tbody
 	script(type='text/javascript').
-		var user_name = !{JSON.stringify(username)};
-	script(src="/javascripts/user.js")
+		var event_name = !{JSON.stringify(eventname)};
+	script(src="/javascripts/event.js")

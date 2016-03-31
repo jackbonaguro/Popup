@@ -20,7 +20,7 @@ function populateTable() {
 	});
 
 	var postTableContent = '';
-	$.getJSON('/json/u/' + user_name + '/recent', function(data) {
+	$.getJSON('/json/u/' + user_name + '/posts', function(data) {
 		userData.posts = data;
 
 		$.each(data, function() {
@@ -32,5 +32,21 @@ function populateTable() {
 			postTableContent += '</tr>';
 		});
 		$('#postTable tbody').html(postTableContent);
+	});
+
+	var eventTableContent = '';
+	$.getJSON('/json/u/' + user_name + '/events', function(data) {
+		eventData = data;
+		$.each(data, function() {
+			eventTableContent += '<tr>';
+			eventTableContent += '<td><a href="/e/' + this.eventname
+				+ '" rel="' + this.eventname //TODO: either delete or add to other scripts
+				+ '">' + this.eventname + '</a></td>';
+			eventTableContent += '<td>' + this['description']
+				+ '</td>';
+			eventTableContent += '<td>' + this.datecreated + '</td>';
+			eventTableContent += '</tr>';
+		});
+		$('#eventTable tbody').html(eventTableContent);
 	});
 };
