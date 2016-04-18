@@ -5,8 +5,9 @@ html
 		link(rel='stylesheet', href='/stylesheets/style.css')
 		script(src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js")
 	body
-		h1
-			a(href="/")
-				span(style='color: #0BF;') Pop
-				span(style="color: #07B;") up
+		#header
+			span
+				a(href="/")
+					img(src='/logo.png')
+			include accountdiv
 		block content

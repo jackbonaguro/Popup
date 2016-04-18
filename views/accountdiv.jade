@@ -1,0 +1,10 @@
+span(id="accountdiv",style='float:right;border:1px solid #00B7FF;padding:30px;')
+	if loggedIn
+		a(href='/account')
+			- user.name
+	else
+		a(href='/login').
+			Log in
+		||
+		a(href='/signup').
+			Sign Up

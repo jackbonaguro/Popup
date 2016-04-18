@@ -6,7 +6,7 @@ $(document).ready(function() {
 
 function populateTable() {
 	var tableContent = '';
-	$.getJSON('/post/recent', function(data) {
+	$.getJSON('/api/recent', function(data) {
 		userListData = data;
 		$.each(data, function() {
 			tableContent += '<tr>';

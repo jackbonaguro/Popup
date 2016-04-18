@@ -6,7 +6,7 @@ $(function() {
 
 function populateTable() {
 	var eventTableContent = '';
-	$.getJSON('/json/e/' + event_name, function(data) {
+	$.getJSON('/api/e/' + event_name, function(data) {
 		eventData = data;
 
 		eventTableContent += '<tr>';
@@ -20,7 +20,7 @@ function populateTable() {
 	});
 
 	var postTableContent = '';
-	$.getJSON('/json/e/' + event_name + '/posts', function(data) {
+	$.getJSON('/api/e/' + event_name + '/posts', function(data) {
 		eventData.posts = data;
 
 		$.each(data, function() {
@@ -37,7 +37,7 @@ function populateTable() {
 	});
 
 	var userTableContent = '';
-	$.getJSON('/json/e/' + event_name + '/users', function(data) {
+	$.getJSON('/api/e/' + event_name + '/users', function(data) {
 		eventData.users = data;
 
 		$.each(data, function() {

@@ -6,7 +6,7 @@ $(function() {
 
 function populateTable() {
 	var userTableContent = '';
-	$.getJSON('/json/u/' + user_name, function(data) {
+	$.getJSON('/api/u/' + user_name, function(data) {
 		userData = data;
 
 		userTableContent += '<tr>';
@@ -20,7 +20,7 @@ function populateTable() {
 	});
 
 	var postTableContent = '';
-	$.getJSON('/json/u/' + user_name + '/posts', function(data) {
+	$.getJSON('/api/u/' + user_name + '/posts', function(data) {
 		userData.posts = data;
 
 		$.each(data, function() {
@@ -35,12 +35,11 @@ function populateTable() {
 	});
 
 	var eventTableContent = '';
-	$.getJSON('/json/u/' + user_name + '/events', function(data) {
+	$.getJSON('/api/u/' + user_name + '/events', function(data) {
 		eventData = data;
 		$.each(data, function() {
 			eventTableContent += '<tr>';
 			eventTableContent += '<td><a href="/e/' + this.eventname
-				+ '" rel="' + this.eventname //TODO: either delete or add to other scripts
 				+ '">' + this.eventname + '</a></td>';
 			eventTableContent += '<td>' + this['description']
 				+ '</td>';
