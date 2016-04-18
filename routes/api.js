@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
-var crypto = require('crypto');
+var bcrypt = require('bcrypt');
 
 router.get('/posts', function(req, res) {
 	var con = req.con;
@@ -141,20 +141,24 @@ router.get('/e/:eventname/users', function(req, res) {
 	});
 });
 
-router.post('/auth', function(req, res) {
+router.post('/login', function(req, res) {
 	var con = req.con;
 	con.query('SELECT salt, hash FROM passwords WHERE username = ?',
 		req.body.username, function(err, results) {
 		if(err) throw err;
 		req.salt = results[0].salt;
 		req.realHash = results[0]['hash'];
-		crypto.pbkdf2(req.body.password, req.salt, 10000, 512, function(err, hash) {
+		bcrypt.hash(req.body.password, req.salt, function(err, hash) {
 			if(err) throw err;
 			if (hash.toString('hex') == req.realHash) {
-				console.log('Auth successful!');
-				//Generate Session!
-				//res.cookie('')
-				res.redirect('/');
+				console.log('Login successful!');
+				//Generate Session
+				req.session.regenerate(function(err) {
+					if(err) throw err;
+					req.session.loggedIn = true;
+					req.session.username = req.body.username;
+					res.redirect('/');
+				});
 			}else{
 				console.log('Incorrect password!');
 				res.redirect('/');
@@ -163,9 +167,17 @@ router.post('/auth', function(req, res) {
 	});
 });
 
-router.post('/createuser', function(req, res) {
-	var salt = crypto.randomBytes(128).toString('hex');
-	crypto.pbkdf2(req.body.password, salt, 10000, 512, function(err, hash) {
+router.get('/logout', function(req,res) {
+	console.log('Logout!');
+	req.session.destroy(function(err){
+		if(err) throw err;
+		res.redirect('/');
+	});
+});
+
+router.post('/signup', function(req, res) {
+	var salt = bcrypt.genSaltSync(10);
+	bcrypt.hash(req.body.password, salt, function(err, hash) {
 		var con = req.con;
 		var query = 'INSERT INTO passwords (username, salt, hash) VALUES ('
 			+ mysql.escape(req.body.username) + ','
@@ -173,7 +185,13 @@ router.post('/createuser', function(req, res) {
 			+ mysql.escape(hash.toString('hex')) + ');';
 		con.query(query, function(err, results) {
 			if(err) throw err;
-			res.redirect('/');
+			//Generate Session
+			req.session.regenerate(function(err) {
+				if(err) throw err;
+				req.session.loggedIn = true;
+				req.session.username = req.body.username;
+				res.redirect('/');
+			});
 		});
 	});
 });

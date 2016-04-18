@@ -4,7 +4,7 @@ block content
 	div(class='wrapper')
 		h2= title
 
-		form(method='POST', action='/api/auth')
+		form(method='POST', action='/api/login')
 			input(type='hidden', name='_method', value='POST')
 			p Username
 			input(type='text', name='username')
@@ -12,6 +12,3 @@ block content
 			input(type='password', name='password')
 			p
 			input(type='submit' value='Submit')
-
-	//- script(type='text/javascript').
-		var user_name = !{JSON.stringify(username)};
