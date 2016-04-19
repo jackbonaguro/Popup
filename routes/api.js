@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
-var bcrypt = require('bcrypt');
+var crypto = require('crypto');
 
 router.get('/posts', function(req, res) {
 	var con = req.con;
@@ -148,7 +148,7 @@ router.post('/login', function(req, res) {
 		if(err) throw err;
 		req.salt = results[0].salt;
 		req.realHash = results[0]['hash'];
-		bcrypt.hash(req.body.password, req.salt, function(err, hash) {
+		crypto.pbkdf2(req.body.password, req.salt, 10000, 512, function(err, hash) {
 			if(err) throw err;
 			if (hash.toString('hex') == req.realHash) {
 				console.log('Login successful!');
@@ -176,8 +176,8 @@ router.get('/logout', function(req,res) {
 });
 
 router.post('/signup', function(req, res) {
-	var salt = bcrypt.genSaltSync(10);
-	bcrypt.hash(req.body.password, salt, function(err, hash) {
+	var salt = crypto.randomBytes(128).toString('hex');
+	crypto.pbkdf2(req.body.password, salt, 10000, 512, function(err, hash) {
 		var con = req.con;
 		var query = 'INSERT INTO passwords (username, salt, hash) VALUES ('
 			+ mysql.escape(req.body.username) + ','
