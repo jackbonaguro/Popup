@@ -1,0 +1,26 @@
+extends layout
+
+block content
+	div(class='wrapper')
+		h2= title
+
+		form(method='POST', action='/api/newpost' enctype='multipart/form-data')
+			input(type='hidden', name='_method', value='POST')
+			p Event:
+			select#event(name='event').
+			p Select File:
+			input(type='file', name='image')
+			p
+			input(type='submit' value='Submit')
+
+	script(type='text/javascript').
+		var eventsHtml = " ";
+		$.getJSON('/api/u/' + currentuser.username + '/events', function(data) {
+			console.log(data);
+			$.each(data, function() {
+				eventsHtml += '<option value="' + this.id
+					+ '">' + this.eventname + '</option>';
+				console.log(eventsHtml);
+			});
+			$('#event').html(eventsHtml);
+		});

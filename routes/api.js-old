@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
+var crypto = require('crypto');
 
 router.get('/posts', function(req, res) {
 	var con = req.con;
@@ -136,6 +137,43 @@ router.get('/e/:eventname/users', function(req, res) {
 					console.log("JSON: ", req.users);
 					res.json(req.users);
 			});
+		});
+	});
+});
+
+router.post('/auth', function(req, res) {
+	var con = req.con;
+	con.query('SELECT salt, hash FROM passwords WHERE username = ?',
+		req.body.username, function(err, results) {
+		if(err) throw err;
+		req.salt = results[0].salt;
+		req.realHash = results[0]['hash'];
+		crypto.pbkdf2(req.body.password, req.salt, 10000, 512, function(err, hash) {
+			if(err) throw err;
+			if (hash.toString('hex') == req.realHash) {
+				console.log('Auth successful!');
+				//Generate Session!
+				//res.cookie('')
+				res.redirect('/');
+			}else{
+				console.log('Incorrect password!');
+				res.redirect('/');
+			}
+		});
+	});
+});
+
+router.post('/createuser', function(req, res) {
+	var salt = crypto.randomBytes(128).toString('hex');
+	crypto.pbkdf2(req.body.password, salt, 10000, 512, function(err, hash) {
+		var con = req.con;
+		var query = 'INSERT INTO passwords (username, salt, hash) VALUES ('
+			+ mysql.escape(req.body.username) + ','
+			+ mysql.escape(salt.toString('hex')) + ','
+			+ mysql.escape(hash.toString('hex')) + ');';
+		con.query(query, function(err, results) {
+			if(err) throw err;
+			res.redirect('/');
 		});
 	});
 });

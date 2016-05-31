@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
 var crypto = require('crypto');
+var multer = require('multer');
+var path = require('path');
 
 router.get('/posts', function(req, res) {
 	var con = req.con;
@@ -153,11 +155,15 @@ router.post('/login', function(req, res) {
 			if (hash.toString('hex') == req.realHash) {
 				console.log('Login successful!');
 				//Generate Session
-				req.session.regenerate(function(err) {
-					if(err) throw err;
-					req.session.loggedIn = true;
-					req.session.username = req.body.username;
-					res.redirect('/');
+				con.query('SELECT * FROM users WHERE username = ?',
+					req.body.username, function(err, results) {
+					var user = results[0];
+					req.session.regenerate(function(err) {
+						if(err) throw err;
+						req.session.loggedIn = true;
+						req.session.user = user;
+						res.redirect('/');
+					});
 				});
 			}else{
 				console.log('Incorrect password!');
@@ -183,17 +189,89 @@ router.post('/signup', function(req, res) {
 			+ mysql.escape(req.body.username) + ','
 			+ mysql.escape(salt.toString('hex')) + ','
 			+ mysql.escape(hash.toString('hex')) + ');';
-		con.query(query, function(err, results) {
+		con.query(query, function(err) {
 			if(err) throw err;
 			//Generate Session
-			req.session.regenerate(function(err) {
-				if(err) throw err;
-				req.session.loggedIn = true;
-				req.session.username = req.body.username;
-				res.redirect('/');
+			var query2 = 'INSERT INTO users (username, bio) VALUES ('
+				+ mysql.escape(req.body.username)
+				+ mysql.escape(req.body.bio);
+			con.query(query2, function(err) {
+				con.query('SELECT * FROM users WHERE username = ?',
+					req.body.username, function(err, results) {
+					var user = results[0];
+					req.session.regenerate(function(err) {
+						if(err) throw err;
+						req.session.loggedIn = true;
+						req.session.user = user;
+						res.redirect('/');
+					});
+				});
 			});
 		});
 	});
+});
+
+router.post('/edit', function(req, res) {
+	var query = 'UPDATE users SET username=' + mysql.escape(req.body.username)
+		+ ', bio=' + mysql.escape(req.body.bio) + ' WHERE id='
+		+ mysql.escape(req.session.user.id) +';';
+	req.con.query(query, function(err) {
+		if(err) throw err;
+		res.redirect('/account');
+	}) 
+});
+
+//Using multer to store photo uploads,
+//but post must enter db before filename is determined from its id.
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+  	var dest = path.join(__dirname, '../public/images');
+    cb(null, dest);
+  },
+  filename: function(req, file, cb) {
+    var fname = "";
+  	var insertId = 0;
+  	//Create post in db, assing id to insertId
+  	var query = 'INSERT INTO posts (username, imgsrc) VALUES ('
+  		+ mysql.escape(req.session.user.username) + ', \'\');';
+  	req.con.query(query, function(err, result){
+  		if(err) throw err;
+  		insertId = result.insertId;
+  		fname = ("000" + insertId + ".jpg").slice(-8);
+
+  		/*
+  		 *Realistically at this point you could call the callback and
+  		 *move the rest to the app.post method.
+  		 */
+
+  		//Now update table with fname using insertId
+  		var query2 = 'UPDATE posts SET imgsrc=' + mysql.escape(fname)
+  			+ ' WHERE id=' + mysql.escape(insertId) + ';';
+  		req.con.query(query2, function(err){
+  			if(err) throw err;
+  			//Now add the post to userposts
+  			query3 = 'INSERT INTO userposts (userid, postid) VALUES ('
+  				+ mysql.escape(req.session.user.id) + ', '
+  				+ mysql.escape(insertId) + ')';
+  			req.con.query(query3, function(err){
+  				if(err) throw err;
+  				//Now add the post to eventposts
+  				query4 = 'INSERT INTO  eventposts (eventid, postid) VALUES ('
+  					+ mysql.escape(parseInt(req.body['event'])) + ', '
+  					+ mysql.escape(insertId) + ');';
+  				req.con.query(query4, function(err){
+  					if(err) throw err;
+	    			cb(null, fname);
+  				});
+  			});
+  		});
+  	});
+  }
+});
+var upload = multer({ storage: storage });
+
+router.post('/newpost', upload.single('image'), function(req, res) {
+	res.redirect('/');
 });
 
 module.exports = router;

@@ -1,0 +1,21 @@
+extends layout
+
+block content
+	div(class='wrapper')
+		h2= title
+		form(method='POST', action='/api/edit')
+			input(type='hidden', name='_method', value='POST')
+			
+			table(id='accountTable')
+					tbody
+						tr
+							td
+								input#username(type='text', name='username')
+						tr
+							td
+								input#bio(type='text', name='bio')
+			input(type='submit' value='Submit')
+	script(type='text/javascript').
+		var current_user = !{JSON.stringify(currentuser)};
+		$('#username').attr('value', current_user.username);
+		$('#bio').attr('value', current_user.bio);

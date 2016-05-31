@@ -1,0 +1,18 @@
+extends layout
+
+block content
+	div(class='wrapper')
+		h2= title
+		table(id='accountTable')
+				tbody
+					tr
+						td
+							a#userlink
+					tr
+						td#bio
+		a(href='/edit') Edit Profile
+	script(type='text/javascript').
+		var current_user = !{JSON.stringify(currentuser)};
+		$('#userlink').html(current_user.username);
+		$('#userlink').attr("href", "/u/" + current_user.username);
+		$('#bio').html(current_user.bio);

@@ -7,7 +7,11 @@ html
 	body
 		#header
 			span
-				a(href="/")
+				a(href='/')
 					img(src='/logo.png')
 			include accountdiv
+		if loggedIn
+			a(href='/newpost') New Post
+			br
+			a(href='/newevent') New Event
 		block content
