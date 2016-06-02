@@ -2,6 +2,9 @@ extends layout
 
 block content
 	div(class='wrapper')
+		a(href='/edit') Edit Profile
+		br
+		br
 		h2= title
 		table(id='accountTable')
 				tbody
@@ -10,9 +13,20 @@ block content
 							a#userlink
 					tr
 						td#bio
-		a(href='/edit') Edit Profile
+	div(class='wrapper')
+		h2= heading2
+		table(id='postTable')
+			thead
+				th Content
+				th Date
+			tbody
+		h2= heading3
+		table(id='eventTable')
+			thead
+				th Event Name
+				th Description
+				th Date
+			tbody
 	script(type='text/javascript').
 		var current_user = !{JSON.stringify(currentuser)};
-		$('#userlink').html(current_user.username);
-		$('#userlink').attr("href", "/u/" + current_user.username);
-		$('#bio').html(current_user.bio);
+	script(src='/javascripts/account.js')		

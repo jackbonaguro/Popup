@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var filestore = require('session-file-store')(session);
 
 var mysql = require('mysql');
 var con = mysql.createConnection({
@@ -32,8 +33,9 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(session({resave: false,
+app.use(session({resave: true,
   saveUninitialized: true,
+  store: new filestore,
   secret: 'ABCDEFGH12345678'}));
 app.use(logger('dev'));
 app.use(bodyParser.json());

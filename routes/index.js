@@ -16,7 +16,7 @@ router.get('/p/:postid', function(req, res) {
 });
 
 router.get('/u/:username', function(req, res) {
-	res.render('user', { title: 'User', heading2: 'User',
+	res.render('user', { title: 'User', heading2: 'Posts',
 		heading3: 'Events',
 		username: req.params.username,
 		loggedIn: req.session.loggedIn,
@@ -24,7 +24,7 @@ router.get('/u/:username', function(req, res) {
 });
 
 router.get('/e/:eventname', function(req, res) {
-	res.render('event', { title: 'Event', heading2: 'Event',
+	res.render('event', { title: 'Event', heading2: 'Posts',
 		heading3: 'Users',
 		eventname: req.params.eventname,
 		loggedIn: req.session.loggedIn,
@@ -45,6 +45,8 @@ router.get('/signup', function(req, res) {
 
 router.get('/account', function(req, res) {
 	res.render('account', {title: 'Account',
+		heading2: 'Your Posts',
+		heading3: 'Your Events',
 		loggedIn: req.session.loggedIn,
 		currentuser: req.session.user});
 });
@@ -58,6 +60,12 @@ router.get('/edit', function(req, res) {
 
 router.get('/newpost', function(req, res) {
 	res.render('newpost', {title: 'New Post',
+		loggedIn: req.session.loggedIn,
+		currentuser: req.session.user});
+});
+
+router.get('/newevent', function(req, res) {
+	res.render('newevent', {title: 'New Event',
 		loggedIn: req.session.loggedIn,
 		currentuser: req.session.user});
 });

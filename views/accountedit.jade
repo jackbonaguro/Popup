@@ -15,7 +15,22 @@ block content
 							td
 								input#bio(type='text', name='bio')
 			input(type='submit' value='Submit')
+	div(class='wrapper')
+		h2= heading2
+		table(id='postTable')
+			thead
+				th Content
+				th Date
+				th Delete?
+			tbody
+		h2= heading3
+		table(id='eventTable')
+				thead
+						th Event Name
+						th Description
+						th Date
+						th Delete?
+				tbody
 	script(type='text/javascript').
 		var current_user = !{JSON.stringify(currentuser)};
-		$('#username').attr('value', current_user.username);
-		$('#bio').attr('value', current_user.bio);
+	script(src='/javascripts/accountedit.js')

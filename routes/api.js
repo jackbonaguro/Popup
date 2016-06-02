@@ -5,6 +5,7 @@ var crypto = require('crypto');
 var multer = require('multer');
 var path = require('path');
 
+//Routes for the homepage - to be removed
 router.get('/posts', function(req, res) {
 	var con = req.con;
 	con.query('SELECT * FROM posts;', function(err, results) {
@@ -21,6 +22,7 @@ router.get('/events', function(req, res) {
 	});
 });
 
+//Post Routes
 router.get('/p/:postid', function(req, res) {
 	var con = req.con;
 	con.query('SELECT * FROM posts WHERE id = ?;',
@@ -31,6 +33,7 @@ router.get('/p/:postid', function(req, res) {
 	});
 });
 
+//User Routes
 router.get('/u/:username', function(req, res) {
 	var con = req.con;
 	con.query('SELECT * FROM users WHERE username = ?',
@@ -87,6 +90,7 @@ router.get('/u/:username/events', function(req, res) {
 	});
 });
 
+//Event Routes
 router.get('/e/:eventname', function(req, res) {
 	var con = req.con;
 	con.query('SELECT * FROM events WHERE eventname = ?',
@@ -143,6 +147,25 @@ router.get('/e/:eventname/users', function(req, res) {
 	});
 });
 
+//Kinda Event-y, Kinda session-y
+router.put('/joinevent', function(req, res) {
+	var query = 'SELECT id FROM events WHERE eventname=' + mysql.escape(req.body.eventname)
+		+ ';';
+	console.log(query);
+	req.con.query(query, function(err, results) {
+		console.log(results);
+		if(err) throw err;
+		var query2 = 'INSERT INTO eventusers(eventid, userid) VALUES ('
+			+ mysql.escape(results[0].id) + ', ' + mysql.escape(req.session.user.id)
+			+ ');';
+		console.log(query2);
+		req.con.query(query2, function(err) {
+			if(err) throw err;
+		});
+	});
+});
+
+//Session Routes
 router.post('/login', function(req, res) {
 	var con = req.con;
 	con.query('SELECT salt, hash FROM passwords WHERE username = ?',
@@ -191,11 +214,11 @@ router.post('/signup', function(req, res) {
 			+ mysql.escape(hash.toString('hex')) + ');';
 		con.query(query, function(err) {
 			if(err) throw err;
-			//Generate Session
 			var query2 = 'INSERT INTO users (username, bio) VALUES ('
-				+ mysql.escape(req.body.username)
-				+ mysql.escape(req.body.bio);
+				+ mysql.escape(req.body.username) + ', '
+				+ mysql.escape(req.body.bio) + ');';
 			con.query(query2, function(err) {
+				//Generate Session
 				con.query('SELECT * FROM users WHERE username = ?',
 					req.body.username, function(err, results) {
 					var user = results[0];
@@ -217,9 +240,14 @@ router.post('/edit', function(req, res) {
 		+ mysql.escape(req.session.user.id) +';';
 	req.con.query(query, function(err) {
 		if(err) throw err;
+		//Update the session data, otherwise user must re-login to see changes
+		req.session.user.username = req.body.username;
+		req.session.user.bio = req.body.bio;
 		res.redirect('/account');
 	}) 
 });
+
+//Content Creation Routes
 
 //Using multer to store photo uploads,
 //but post must enter db before filename is determined from its id.
@@ -241,7 +269,7 @@ var storage = multer.diskStorage({
 
   		/*
   		 *Realistically at this point you could call the callback and
-  		 *move the rest to the app.post method.
+  		 *move the rest to the router.post method.
   		 */
 
   		//Now update table with fname using insertId
@@ -272,6 +300,52 @@ var upload = multer({ storage: storage });
 
 router.post('/newpost', upload.single('image'), function(req, res) {
 	res.redirect('/');
+});
+
+router.post('/newevent', function(req, res) {
+	var query = 'INSERT INTO events(eventname, description, owner) VALUES ('
+		+ mysql.escape(req.body.eventname) + ', ' + mysql.escape(req.body['description'])
+		+ ', ' + mysql.escape(req.session.user.id) + ');';
+	req.con.query(query, function(err, result){
+		if(err) throw err;
+		var query2 = 'INSERT INTO eventusers(eventid, userid) VALUES ('
+			+ mysql.escape(result.insertId) + ', ' + mysql.escape(req.session.user.id)
+			+ ');';
+		req.con.query(query2, function(err){
+			if(err) throw err;
+			res.redirect('/');
+		});
+	});
+});
+
+//Content Deletion Routes
+router.delete('/delpost', function(req, res) {
+	var postid = mysql.escape(req.body.postid)
+	var query = 'DELETE FROM posts WHERE id=' + postid + ';';
+	req.con.query(query, function(err){
+		if(err) throw err;
+		var query2 = 'DELETE FROM userposts WHERE postid=' + postid + ';';
+		req.con.query(query2, function(err){
+			if(err) throw err;
+			var query3 = 'DELETE FROM eventposts WHERE postid=' + postid + ';';
+			req.con.query(query3, function(err){
+				if(err) throw err;
+				//res.redirect('/edit');
+			});
+		});
+	});
+});
+
+router.delete('/delevent', function(req, res) {
+	var eventid = mysql.escape(req.body.eventid)
+	var query = 'DELETE FROM events WHERE id=' + eventid + ';';
+	req.con.query(query, function(err){
+		if(err) throw err;
+		var query2 = 'DELETE FROM eventusers WHERE eventid=' + eventid + ';';
+		req.con.query(query2, function(err){
+			if(err) throw err;
+		});
+	});
 });
 
 module.exports = router;

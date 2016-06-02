@@ -49,5 +49,29 @@ function populateTable() {
 			userTableContent += '</tr>';
 		});
 		$('#userTable tbody').html(userTableContent);
+
+		if(logged_in){//If user has not joined event, render join button
+			var add = true;
+			$.each(eventData.users,function() {
+				if(currentuser.username === this.username) {
+					add = false;
+				}
+			});
+			if(add) {
+				$('#join').html('<button onclick="joinEvent()">Join Event</button>');
+			}
+		}
 	});
 };
+
+function joinEvent() {
+	var jdata = 'eventname='+event_name;
+	$.ajax({
+		type: 'PUT',
+		url: '/api/joinevent',
+		data: jdata,
+		success: function(msg) {//TODO: Remove?
+		}
+	});
+	window.location.reload();
+}

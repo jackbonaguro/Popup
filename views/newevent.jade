@@ -1,0 +1,14 @@
+extends layout
+
+block content
+	div(class='wrapper')
+		h2= title
+
+		form(method='POST', action='/api/newevent')
+			input(type='hidden', name='_method', value='POST')
+			p Name
+			input(type='text', name='eventname')
+			p Description
+			input(type='text', name='description')
+			p
+			input(type='submit' value='Submit')

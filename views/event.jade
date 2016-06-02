@@ -2,6 +2,9 @@ extends layout
 
 block content
 	div(class='wrapper')
+		#join
+		br
+		br
 		h2= title
 		table(id='eventTable')
 			thead
@@ -26,4 +29,5 @@ block content
 			tbody
 	script(type='text/javascript').
 		var event_name = !{JSON.stringify(eventname)};
+		var logged_in = !{JSON.stringify(loggedIn)};
 	script(src="/javascripts/event.js")
